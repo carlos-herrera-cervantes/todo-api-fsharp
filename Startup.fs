@@ -1,16 +1,25 @@
 namespace TodoApi
 
-open System
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
-open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
+open Microsoft.Extensions.Configuration
+open Microsoft.AspNetCore.Mvc.NewtonsoftJson
+open TodoApi.Managers
 
-type Startup() =
+type Startup private () =
+
+    member val Configuration : IConfiguration = null with get, set
+
+    new (configuration: IConfiguration) as this =
+        Startup() then
+        this.Configuration <- configuration
 
     member this.ConfigureServices(services: IServiceCollection) =
-        services.AddControllers() |> ignore
+        services.AddControllers().AddNewtonsoftJson() |> ignore
+        services.AddTransient<IUserManager, UserManager>() |> ignore
+        services.AddSingleton<IConfiguration>(this.Configuration) |> ignore
 
     member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
         if env.IsDevelopment() then
