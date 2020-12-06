@@ -7,14 +7,14 @@ open Newtonsoft.Json
 [<CLIMutable>]
 type User = {
     [<BsonElement("_id")>]
-    [<JsonProperty("_id")>]
-    Id : BsonObjectId;
+    [<JsonProperty("id")>]
+    Id : BsonObjectId
 
     [<BsonElement("email")>]
     [<JsonProperty("email")>]
-    Email : string;
+    Email : string
 
     [<BsonElement("name")>]
     [<JsonProperty("name")>]
-    Name : string;
+    Name : string
 }

@@ -7,6 +7,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Configuration
 open Microsoft.AspNetCore.Mvc.NewtonsoftJson
 open TodoApi.Managers
+open TodoApi.Repositories
 
 type Startup private () =
 
@@ -20,6 +21,7 @@ type Startup private () =
         services.AddControllers().AddNewtonsoftJson() |> ignore
         services.AddTransient<IUserManager, UserManager>() |> ignore
         services.AddSingleton<IConfiguration>(this.Configuration) |> ignore
+        services.AddSingleton<IUserRepository, UserRepository>() |> ignore
 
     member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
         if env.IsDevelopment() then

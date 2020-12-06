@@ -1,8 +1,10 @@
 namespace TodoApi.Controllers
 
 open Microsoft.AspNetCore.Mvc
+open Microsoft.AspNetCore.JsonPatch
 open TodoApi.Models
 open TodoApi.Managers
+open TodoApi.Repositories
 
 [<Route("api/v1/users")>]
 [<ApiController>]
@@ -10,34 +12,39 @@ type UserController private () =
     inherit ControllerBase()
 
     member val _userManager : IUserManager = null with get, set
+    member val _userRepository : IUserRepository = null with get, set
 
-    new (userManager : IUserManager) as this =
+    new (userManager : IUserManager, userRepository : IUserRepository) as this =
         UserController() then
         this._userManager <- userManager
+        this._userRepository <- userRepository
 
     [<HttpGet>]
     member this.Get () =
-        ActionResult<Response<_>>({ Status = true; Data = []; })
+        let users = this._userRepository.GetAllAsync() |> Async.AwaitTask |> Async.RunSynchronously
+        let response = { Status = true; Data = users; }
+        response |> this.Ok :> IActionResult
 
     [<HttpGet("{id}")>]
-    member this.GetById(id: string) =
-        ActionResult<Response<_>>({ Status = true; Data = []; })
+    member this.GetById (id: string) =
+        let user = this._userRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
+        let response = { Status = true; Data = user; }
+        response |> this.Ok :> IActionResult
 
     [<HttpPost>]
     member this.Create (user: User) : IActionResult =
-        this._userManager.CreateAsync user |> Async.StartAsTask |> Async.AwaitTask |> ignore
+        this._userManager.CreateAsync user |> Async.AwaitTask |> ignore
+        let response = { Status = true; Data = user; }
+        this.Created("", response) :> IActionResult
+
+    [<HttpPatch("{id}")>]
+    member this.UpdateById(id: string, [<FromBodyAttribute>] replaceUser: JsonPatchDocument<User>) =
+        let user = this._userRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
+        this._userManager.UpdateByIdAsync (id)(user)(replaceUser) |> Async.AwaitTask |> Async.RunSynchronously |> ignore
         let response = { Status = true; Data = user; }
         response |> this.Ok :> IActionResult
-        
-    // [<HttpPatch("{id}")>]
-    // member this.UpdateById(id: string, user: User) =
-    //     let userFinded = users |> Seq.filter(fun u -> u.Id = id) |> Seq.head
-    //     let usersWithoutMatch = users |> Seq.filter(fun u -> u.Id <> id)
-    //     userFinded.Name <- user.Name
-    //     let usersUpdated = Seq.append usersWithoutMatch [userFinded]
-    //     ActionResult<Response<_>>({ Status = true; Data = usersUpdated; })
 
-    // [<HttpDelete("{id}")>]
-    // member this.DeleteById(id: string) =
-    //     let result = users |> Seq.filter(fun u -> u.Id <> id)
-    //     ActionResult<Response<_>>({ Status = true; Data = result; })
+    [<HttpDelete("{id}")>]
+    member this.DeleteById (id: string) =
+        this._userManager.DeleteByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously |> ignore
+        this.NoContent() :> IActionResult

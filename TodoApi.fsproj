@@ -10,6 +10,8 @@
     <Compile Include="Models/Response.fs" />
     <Compile Include="Managers/IUserManager.fs" />
     <Compile Include="Managers/UserManager.fs" />
+    <Compile Include="Repositories/IUserRepository.fs" />
+    <Compile Include="Repositories/UserRepository.fs" />
     <Compile Include="Controllers/UserController.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
