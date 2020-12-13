@@ -7,12 +7,18 @@
   <ItemGroup>
     <Compile Include="Infrastructure/MongoDBFactory.fs" />
     <Compile Include="Models/User.fs" />
+    <Compile Include="Models/Todo.fs" />
     <Compile Include="Models/Response.fs" />
     <Compile Include="Managers/IUserManager.fs" />
     <Compile Include="Managers/UserManager.fs" />
+    <Compile Include="Managers/ITodoManager.fs" />
+    <Compile Include="Managers/TodoManager.fs" />
     <Compile Include="Repositories/IUserRepository.fs" />
     <Compile Include="Repositories/UserRepository.fs" />
+    <Compile Include="Repositories/ITodoRepository.fs" />
+    <Compile Include="Repositories/TodoRepository.fs" />
     <Compile Include="Controllers/UserController.fs" />
+    <Compile Include="Controllers/TodoController.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

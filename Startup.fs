@@ -19,9 +19,11 @@ type Startup private () =
 
     member this.ConfigureServices(services: IServiceCollection) =
         services.AddControllers().AddNewtonsoftJson() |> ignore
-        services.AddTransient<IUserManager, UserManager>() |> ignore
+        services.AddSingleton<IUserManager, UserManager>() |> ignore
         services.AddSingleton<IConfiguration>(this.Configuration) |> ignore
         services.AddSingleton<IUserRepository, UserRepository>() |> ignore
+        services.AddSingleton<ITodoRepository, TodoRepository>() |> ignore
+        services.AddSingleton<ITodoManager, TodoManager>() |> ignore
 
     member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
         if env.IsDevelopment() then
