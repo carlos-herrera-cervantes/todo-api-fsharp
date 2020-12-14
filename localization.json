@@ -1,0 +1,16 @@
+[
+    {
+        "Key": "UserNotFound",
+        "LocalizedValue": {
+            "en": "User not found",
+            "es": "Usuario no encontrado"
+        }
+    },
+    {
+        "Key": "InvalidObjectId",
+        "LocalizedValue": {
+            "en": "The ID is not valid",
+            "es": "El ID no es válido"
+        }
+    }
+]

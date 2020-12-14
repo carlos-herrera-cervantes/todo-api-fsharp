@@ -5,6 +5,7 @@ open Microsoft.AspNetCore.JsonPatch
 open TodoApi.Models
 open TodoApi.Managers
 open TodoApi.Repositories
+open TodoApi.Attributes
 
 [<Route("api/v1/users")>]
 [<ApiController>]
@@ -26,6 +27,7 @@ type UserController private () =
         response |> this.Ok :> IActionResult
 
     [<HttpGet("{id}")>]
+    [<UserExists>]
     member this.GetById (id: string) =
         let user = this._userRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
         let response = { Status = true; Data = user; }
