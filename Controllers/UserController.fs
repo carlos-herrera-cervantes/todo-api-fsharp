@@ -22,31 +22,41 @@ type UserController private () =
 
     [<HttpGet>]
     member this.Get () =
-        let users = this._userRepository.GetAllAsync() |> Async.AwaitTask |> Async.RunSynchronously
-        let response = { Status = true; Data = users; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! users = this._userRepository.GetAllAsync() |> Async.AwaitTask
+            let response = { Status = true; Data = users; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpGet("{id}")>]
     [<UserExists>]
     member this.GetById (id: string) =
-        let user = this._userRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
-        let response = { Status = true; Data = user; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! user = this._userRepository.GetByIdAsync id |> Async.AwaitTask
+            let response = { Status = true; Data = user; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpPost>]
-    member this.Create (user: User) : IActionResult =
-        this._userManager.CreateAsync user |> Async.AwaitTask |> ignore
-        let response = { Status = true; Data = user; }
-        this.Created("", response) :> IActionResult
+    member this.Create (user: User) =
+        async {
+            do! this._userManager.CreateAsync user |> Async.AwaitTask
+            let response = { Status = true; Data = user; }
+            return this.Created("", response) :> IActionResult
+        }
 
     [<HttpPatch("{id}")>]
     member this.UpdateById(id: string, [<FromBodyAttribute>] replaceUser: JsonPatchDocument<User>) =
-        let user = this._userRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
-        this._userManager.UpdateByIdAsync (id)(user)(replaceUser) |> Async.AwaitTask |> Async.RunSynchronously |> ignore
-        let response = { Status = true; Data = user; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! user = this._userRepository.GetByIdAsync id |> Async.AwaitTask 
+            let! result = this._userManager.UpdateByIdAsync (id)(user)(replaceUser) |> Async.AwaitTask
+            let response = { Status = true; Data = user; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpDelete("{id}")>]
     member this.DeleteById (id: string) =
-        this._userManager.DeleteByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously |> ignore
-        this.NoContent() :> IActionResult
+        async {
+            let! result = this._userManager.DeleteByIdAsync id |> Async.AwaitTask
+            return this.NoContent() :> IActionResult
+        }

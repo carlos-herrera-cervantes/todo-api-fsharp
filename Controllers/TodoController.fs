@@ -21,30 +21,40 @@ type TodoController private () =
 
     [<HttpGet>]
     member this.Get () =
-        let todos = this._todoRepository.GetAllAsync() |> Async.AwaitTask |> Async.RunSynchronously
-        let response = { Status = true; Data = todos; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! todos = this._todoRepository.GetAllAsync() |> Async.AwaitTask
+            let response = { Status = true; Data = todos; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpGet("{id}")>]
     member this.GetById (id: string) =
-        let todo = this._todoRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
-        let response = { Status = true; Data = todo; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! todo = this._todoRepository.GetByIdAsync id |> Async.AwaitTask
+            let response = { Status = true; Data = todo; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpPost>]
     member this.Create (todo: Todo) =
-        this._todoManager.CreateAsync todo |> Async.AwaitTask |> ignore
-        let response = { Status = true; Data = todo; }
-        this.Created("", response) :> IActionResult
+        async {
+            do! this._todoManager.CreateAsync todo |> Async.AwaitTask
+            let response = { Status = true; Data = todo; }
+            return this.Created("", response) :> IActionResult
+        }
 
     [<HttpPatch("{id}")>]
     member this.UpdateById (id: string, [<FromBodyAttribute>] replaceTodo: JsonPatchDocument<Todo>) =
-        let todo = this._todoRepository.GetByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously
-        this._todoManager.UpdateByIdAsync (id)(todo)(replaceTodo) |> Async.AwaitTask |> Async.RunSynchronously |> ignore
-        let response = { Status = true; Data = todo; }
-        response |> this.Ok :> IActionResult
+        async {
+            let! todo = this._todoRepository.GetByIdAsync id |> Async.AwaitTask
+            let! result = this._todoManager.UpdateByIdAsync (id)(todo)(replaceTodo) |> Async.AwaitTask
+            let response = { Status = true; Data = todo; }
+            return response |> this.Ok :> IActionResult
+        }
 
     [<HttpDelete("{id}")>]
     member this.DeleteById (id: string) =
-        this._todoManager.DeleteByIdAsync id |> Async.AwaitTask |> Async.RunSynchronously |> ignore
-        this.NoContent() :> IActionResult
+        async {
+            let! result = this._todoManager.DeleteByIdAsync id |> Async.AwaitTask
+            return this.NoContent() :> IActionResult
+        }

@@ -1,5 +1,6 @@
 namespace TodoApi.Attributes
 
+open System
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Mvc.Filters
@@ -25,18 +26,15 @@ type UserExistsFilter private () =
                 try
                     let pair = context.ActionArguments.TryGetValue("id")
                     let id = snd pair
-                    let user = this._userRepository.GetByIdAsync(id.ToString()) |> Async.AwaitTask |> Async.RunSynchronously
+                    let! user = this._userRepository.GetByIdAsync(id.ToString()) |> Async.AwaitTask
                     
                     if (box user = null) then
                         context.Result <- { Status = false; Message = this._localizer.Item("UserNotFound").Value; Code = "UserNotFound" } |> NotFoundObjectResult
-
-                    let task = next.Invoke()
-                    return task
+                    else
+                        do! next.Invoke() :> Task |> Async.AwaitTask
                 with
-                | :? System.AggregateException as e ->
+                | :? AggregateException as e ->
                     context.Result <- { Status = false; Message = this._localizer.Item("InvalidObjectId").Value; Code = "InvalidObjectId" } |> BadRequestObjectResult
-                    let task = next.Invoke()
-                    return task
             }
             |> Async.StartAsTask :> Task
             
