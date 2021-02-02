@@ -14,6 +14,7 @@ open Microsoft.Extensions.Localization
 open TodoApi.Managers
 open TodoApi.Repositories
 open TodoApi.Models
+open TodoApi.Extensions.TokenAuthentication
 
 type Startup private () =
 
@@ -27,6 +28,7 @@ type Startup private () =
         services.AddLocalization(fun options -> options.ResourcesPath <- "Resources") |> ignore
         services.AddControllers().AddNewtonsoftJson().AddDataAnnotationsLocalization(fun options -> 
             options.DataAnnotationLocalizerProvider <- Func<Type, IStringLocalizerFactory, IStringLocalizer>(fun _ factory -> factory.Create(typeof<SharedResources>))) |> ignore
+        services.AddTokenAuthentication(this.Configuration) |> ignore
         services.AddSingleton<IUserManager, UserManager>() |> ignore
         services.AddSingleton<IConfiguration>(this.Configuration) |> ignore
         services.AddSingleton<IUserRepository, UserRepository>() |> ignore
@@ -48,6 +50,7 @@ type Startup private () =
             options.DefaultRequestCulture <- new RequestCulture("en")
             options.SupportedCultures <- cultures
             options.SupportedUICultures <- cultures)) |> ignore
+        app.UseAuthentication() |> ignore
         app.UseRouting() |> ignore
-
+        app.UseAuthorization() |> ignore
         app.UseEndpoints(fun endpoints -> endpoints.MapControllers() |> ignore) |> ignore

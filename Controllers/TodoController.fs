@@ -2,10 +2,12 @@ namespace TodoApi.Controllers
 
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.JsonPatch
+open Microsoft.AspNetCore.Authorization
 open TodoApi.Models
 open TodoApi.Managers
 open TodoApi.Repositories
 
+[<Authorize>]
 [<Route("api/v1/todos")>]
 [<ApiController>]
 type TodoController private () =

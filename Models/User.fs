@@ -17,4 +17,8 @@ type User = {
     [<BsonElement("name")>]
     [<JsonProperty("name")>]
     Name : string
+
+    [<BsonElement("password")>]
+    [<JsonProperty("password")>]
+    Password : string
 }
