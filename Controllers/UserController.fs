@@ -2,11 +2,13 @@ namespace TodoApi.Controllers
 
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.JsonPatch
+open Microsoft.AspNetCore.Authorization
 open TodoApi.Models
 open TodoApi.Managers
 open TodoApi.Repositories
 open TodoApi.Attributes
 
+[<Authorize>]
 [<Route("api/v1/users")>]
 [<ApiController>]
 type UserController private () = 
@@ -37,6 +39,7 @@ type UserController private () =
             return response |> this.Ok :> IActionResult
         }
 
+    [<AllowAnonymous>]
     [<HttpPost>]
     member this.Create (user: User) =
         async {

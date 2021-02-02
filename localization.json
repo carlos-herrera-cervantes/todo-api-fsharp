@@ -12,5 +12,33 @@
             "en": "The ID is not valid",
             "es": "El ID no es válido"
         }
+    },
+    {
+        "Key": "InvalidCredentials",
+        "LocalizedValue": {
+            "en": "Wrong user or password",
+            "es": "Usuario o contraseña incorrectos"
+        }
+    },
+    {
+        "Key": "EmailRequired",
+        "LocalizedValue": {
+            "en": "The email is required",
+            "es": "El email es requerido"
+        }
+    },
+    {
+        "Key": "PasswordRequired",
+        "LocalizedValue": {
+            "en": "The password is required",
+            "es": "La contraseña es requerida"
+        }
+    },
+    {
+        "Key": "EmailFormatInvalid",
+        "LocalizedValue": {
+            "en": "The format of email is invalid",
+            "es": "El formato del email es inválido"
+        }
     }
 ]

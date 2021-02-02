@@ -7,6 +7,10 @@
   <ItemGroup>
     <Compile Include="SharedResources.fs" />
     <Compile Include="Infrastructure/MongoDBFactory.fs" />
+    <Compile Include="Constants/Operators.fs" />
+    <Compile Include="Models/TypeOperator.fs" />
+    <Compile Include="Models/Request.fs" />
+    <Compile Include="Models/Credentials.fs" />
     <Compile Include="Models/User.fs" />
     <Compile Include="Models/Todo.fs" />
     <Compile Include="Models/Localizer.fs" />
@@ -22,13 +26,17 @@
     <Compile Include="Repositories/ITodoRepository.fs" />
     <Compile Include="Repositories/TodoRepository.fs" />
     <Compile Include="Attributes/UserExistsAttribute.fs" />
+    <Compile Include="Controllers/AuthController.fs" />
     <Compile Include="Controllers/UserController.fs" />
     <Compile Include="Controllers/TodoController.fs" />
+    <Compile Include="Extensions/AuthenticationExtensions.fs" />
+    <Compile Include="Extensions/ArrayExtensions.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
