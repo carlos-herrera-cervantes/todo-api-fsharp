@@ -4,6 +4,7 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.JsonPatch
 open Microsoft.AspNetCore.Authorization
 open TodoApi.Models
+open TodoApi.Models.Todo
 open TodoApi.Managers
 open TodoApi.Repositories
 
@@ -40,8 +41,9 @@ type TodoController private () =
     [<HttpPost>]
     member this.Create (todo: Todo) =
         async {
-            do! this._todoManager.CreateAsync todo |> Async.AwaitTask
-            let response = { Status = true; Data = todo; }
+            let obj = setValuesToTodo todo
+            do! this._todoManager.CreateAsync obj |> Async.AwaitTask
+            let response = { Status = true; Data = obj; }
             return this.Created("", response) :> IActionResult
         }
 

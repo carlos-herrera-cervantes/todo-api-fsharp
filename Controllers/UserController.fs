@@ -3,7 +3,10 @@ namespace TodoApi.Controllers
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.JsonPatch
 open Microsoft.AspNetCore.Authorization
+open System.Linq
+open AutoMapper
 open TodoApi.Models
+open TodoApi.Models.User
 open TodoApi.Managers
 open TodoApi.Repositories
 open TodoApi.Attributes
@@ -16,17 +19,19 @@ type UserController private () =
 
     member val _userManager : IUserManager = null with get, set
     member val _userRepository : IUserRepository = null with get, set
+    member val _mapper : IMapper = null with get, set
 
-    new (userManager : IUserManager, userRepository : IUserRepository) as this =
-        UserController() then
+    new (userManager : IUserManager, userRepository : IUserRepository, mapper : IMapper) as this = UserController() then
         this._userManager <- userManager
         this._userRepository <- userRepository
+        this._mapper <- mapper
 
     [<HttpGet>]
     member this.Get () =
         async {
             let! users = this._userRepository.GetAllAsync() |> Async.AwaitTask
-            let response = { Status = true; Data = users; }
+            let dto = users.Select(fun u -> this._mapper.Map<UserDto>(u))
+            let response = { Status = true; Data = dto; }
             return response |> this.Ok :> IActionResult
         }
 
@@ -35,7 +40,8 @@ type UserController private () =
     member this.GetById (id: string) =
         async {
             let! user = this._userRepository.GetByIdAsync id |> Async.AwaitTask
-            let response = { Status = true; Data = user; }
+            let dto = this._mapper.Map<UserDto>(user)
+            let response = { Status = true; Data = dto; }
             return response |> this.Ok :> IActionResult
         }
 
@@ -43,8 +49,10 @@ type UserController private () =
     [<HttpPost>]
     member this.Create (user: User) =
         async {
-            do! this._userManager.CreateAsync user |> Async.AwaitTask
-            let response = { Status = true; Data = user; }
+            let obj = setValuesToUser user
+            do! this._userManager.CreateAsync obj |> Async.AwaitTask
+            let dto  = this._mapper.Map<UserDto>(obj)
+            let response = { Status = true; Data = dto; }
             return this.Created("", response) :> IActionResult
         }
 
@@ -53,7 +61,8 @@ type UserController private () =
         async {
             let! user = this._userRepository.GetByIdAsync id |> Async.AwaitTask 
             let! result = this._userManager.UpdateByIdAsync (id)(user)(replaceUser) |> Async.AwaitTask
-            let response = { Status = true; Data = user; }
+            let dto = this._mapper.Map<UserDto>(user)
+            let response = { Status = true; Data = dto; }
             return response |> this.Ok :> IActionResult
         }
 
