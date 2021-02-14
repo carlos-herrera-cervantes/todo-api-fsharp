@@ -1,5 +1,6 @@
 namespace TodoApi.Models
 
+open System
 open MongoDB.Bson
 open MongoDB.Bson.Serialization.Attributes
 open Newtonsoft.Json
@@ -21,4 +22,29 @@ type Todo = {
     [<BsonElement("done")>]
     [<JsonProperty("done")>]
     Done : bool
+
+    [<BsonElement("createdAt")>]
+    [<JsonProperty("createdAt")>]
+    [<BsonRepresentation(BsonType.DateTime)>]
+    CreatedAt : DateTime
+
+    [<BsonElement("updatedAt")>]
+    [<JsonProperty("updatedAt")>]
+    [<BsonRepresentation(BsonType.DateTime)>]
+    UpdatedAt : DateTime
 }
+
+module Todo =
+
+    /// <summary>Set the minimum values to ToDo object using smart constructor</summary>
+    /// <param name="todo">ToDo object</param>
+    /// <returns>ToDo object</returns>
+    let setValuesToTodo todo =
+        {
+            Id = BsonObjectId(new ObjectId())
+            Title = todo.Title
+            Description = todo.Description
+            Done = false
+            CreatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow
+        }

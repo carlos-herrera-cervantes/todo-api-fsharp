@@ -16,6 +16,7 @@
     <Compile Include="Models/Localizer.fs" />
     <Compile Include="Models/JsonStringLocalizer.fs" />
     <Compile Include="Models/JsonStringLocalizerFactory.fs" />
+    <Compile Include="Models/AutoMapping.fs" />
     <Compile Include="Models/Response.fs" />
     <Compile Include="Managers/IUserManager.fs" />
     <Compile Include="Managers/UserManager.fs" />
@@ -26,16 +27,19 @@
     <Compile Include="Repositories/ITodoRepository.fs" />
     <Compile Include="Repositories/TodoRepository.fs" />
     <Compile Include="Attributes/UserExistsAttribute.fs" />
+    <Compile Include="Extensions/AuthenticationExtensions.fs" />
+    <Compile Include="Extensions/ArrayExtensions.fs" />
+    <Compile Include="Extensions/AutoMapperExtensions.fs" />
     <Compile Include="Controllers/AuthController.fs" />
     <Compile Include="Controllers/UserController.fs" />
     <Compile Include="Controllers/TodoController.fs" />
-    <Compile Include="Extensions/AuthenticationExtensions.fs" />
-    <Compile Include="Extensions/ArrayExtensions.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />

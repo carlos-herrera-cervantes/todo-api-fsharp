@@ -15,6 +15,7 @@ open TodoApi.Managers
 open TodoApi.Repositories
 open TodoApi.Models
 open TodoApi.Extensions.TokenAuthentication
+open TodoApi.Extensions.AutoMapperExtensions
 
 type Startup private () =
 
@@ -26,6 +27,7 @@ type Startup private () =
 
     member this.ConfigureServices(services: IServiceCollection) =
         services.AddLocalization(fun options -> options.ResourcesPath <- "Resources") |> ignore
+        services.AddAutoMapperConfiguration(this.Configuration) |> ignore
         services.AddControllers().AddNewtonsoftJson().AddDataAnnotationsLocalization(fun options -> 
             options.DataAnnotationLocalizerProvider <- Func<Type, IStringLocalizerFactory, IStringLocalizer>(fun _ factory -> factory.Create(typeof<SharedResources>))) |> ignore
         services.AddTokenAuthentication(this.Configuration) |> ignore
@@ -50,6 +52,7 @@ type Startup private () =
             options.DefaultRequestCulture <- new RequestCulture("en")
             options.SupportedCultures <- cultures
             options.SupportedUICultures <- cultures)) |> ignore
+
         app.UseAuthentication() |> ignore
         app.UseRouting() |> ignore
         app.UseAuthorization() |> ignore
