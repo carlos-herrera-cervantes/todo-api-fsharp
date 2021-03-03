@@ -20,7 +20,9 @@ module TokenAuthentication =
                 x.SaveToken <- true
                 x.TokenValidationParameters <- TokenValidationParameters(
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey"))),
+                    IssuerSigningKey = SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(configuration.GetValue<string>("SecretKey"))
+                    ),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 )

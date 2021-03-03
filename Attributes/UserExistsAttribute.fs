@@ -14,8 +14,10 @@ type UserExistsFilter private () =
     member val _userRepository : IUserRepository = null with get, set
     member val _localizer : IStringLocalizer<SharedResources> = null with get, set
 
-    new (userRepository : IUserRepository, localizer : IStringLocalizer<SharedResources>) as this =
-        UserExistsFilter() then
+    new (
+            userRepository : IUserRepository,
+            localizer : IStringLocalizer<SharedResources>
+        ) as this = UserExistsFilter() then
         this._userRepository <- userRepository
         this._localizer <- localizer
 
@@ -29,12 +31,20 @@ type UserExistsFilter private () =
                     let! user = this._userRepository.GetByIdAsync(id.ToString()) |> Async.AwaitTask
                     
                     if (box user = null) then
-                        context.Result <- { Status = false; Message = this._localizer.Item("UserNotFound").Value; Code = "UserNotFound" } |> NotFoundObjectResult
+                        context.Result <- {
+                            Status = false
+                            Message = this._localizer.Item("UserNotFound").Value
+                            Code = "UserNotFound"
+                        } |> NotFoundObjectResult
                     else
                         do! next.Invoke() :> Task |> Async.AwaitTask
                 with
                 | :? AggregateException as e ->
-                    context.Result <- { Status = false; Message = this._localizer.Item("InvalidObjectId").Value; Code = "InvalidObjectId" } |> BadRequestObjectResult
+                    context.Result <- {
+                        Status = false
+                        Message = this._localizer.Item("InvalidObjectId").Value
+                        Code = "InvalidObjectId"
+                    } |> BadRequestObjectResult
             }
             |> Async.StartAsTask :> Task
             

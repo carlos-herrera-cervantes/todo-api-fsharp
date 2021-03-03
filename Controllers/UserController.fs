@@ -6,7 +6,7 @@ open Microsoft.AspNetCore.Authorization
 open System.Linq
 open AutoMapper
 open TodoApi.Models
-open TodoApi.Models.User
+open TodoApi.Models.Paginator
 open TodoApi.Managers
 open TodoApi.Repositories
 open TodoApi.Attributes
@@ -21,17 +21,25 @@ type UserController private () =
     member val _userRepository : IUserRepository = null with get, set
     member val _mapper : IMapper = null with get, set
 
-    new (userManager : IUserManager, userRepository : IUserRepository, mapper : IMapper) as this = UserController() then
+    new (
+            userManager : IUserManager,
+            userRepository : IUserRepository,
+            mapper : IMapper
+        ) as this = UserController() then
         this._userManager <- userManager
         this._userRepository <- userRepository
         this._mapper <- mapper
 
     [<HttpGet>]
-    member this.Get () =
+    member this.Get ([<FromQuery>] request : Request) =
         async {
-            let! users = this._userRepository.GetAllAsync() |> Async.AwaitTask
+            let! users = this._userRepository.GetAllAsync(request) |> Async.AwaitTask
+            let! totalDocs = this._userRepository.CountAsync(request) |> Async.AwaitTask
+
+            let paginator = setObjectPaginator(request)(int(totalDocs))
             let dto = users.Select(fun u -> this._mapper.Map<UserDto>(u))
-            let response = { Status = true; Data = dto; }
+            let response = { Status = true; Data = dto; Paginator = paginator; }
+
             return response |> this.Ok :> IActionResult
         }
 
@@ -49,9 +57,8 @@ type UserController private () =
     [<HttpPost>]
     member this.Create (user: User) =
         async {
-            let obj = setValuesToUser user
-            do! this._userManager.CreateAsync obj |> Async.AwaitTask
-            let dto  = this._mapper.Map<UserDto>(obj)
+            do! this._userManager.CreateAsync user |> Async.AwaitTask
+            let dto  = this._mapper.Map<UserDto>(user)
             let response = { Status = true; Data = dto; }
             return this.Created("", response) :> IActionResult
         }

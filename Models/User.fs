@@ -1,38 +1,43 @@
 namespace TodoApi.Models
 
 open System
+open System.Collections.Generic
+open System.ComponentModel.DataAnnotations
 open MongoDB.Bson
 open MongoDB.Bson.Serialization.Attributes
 open Newtonsoft.Json
 
-[<CLIMutable>]
-type User = {
-    [<BsonElement("_id")>]
-    [<JsonProperty("id")>]
-    Id : BsonObjectId
+type User () =
+    inherit BaseEntity()
+
+    static let relations = new List<Relation>()
+
+    static do
+        relations.Add(new Relation(Entity = "todos", LocalKey = "_id", ForeignKey = "user", JustOne = false))
 
     [<BsonElement("email")>]
     [<JsonProperty("email")>]
-    Email : string
+    [<Required(ErrorMessage = "EmailRequired")>]
+    [<DataType(DataType.EmailAddress, ErrorMessage = "EmailFormatInvalid")>]
+    member val Email : string = null with get, set
 
     [<BsonElement("name")>]
     [<JsonProperty("name")>]
-    Name : string
+    [<Required(ErrorMessage = "NameRequired")>]
+    member val Name : string = null with get, set
 
     [<BsonElement("password")>]
     [<JsonProperty("password")>]
-    Password : string
+    [<Required(ErrorMessage = "PasswordRequired")>]
+    member val Password : string = null with get, set
 
-    [<BsonElement("createdAt")>]
-    [<JsonProperty("createdAt")>]
-    [<BsonRepresentation(BsonType.DateTime)>]
-    CreatedAt : DateTime
+    [<BsonIgnoreIfNull>]
+    [<JsonProperty("todosEmbedded", DefaultValueHandling = DefaultValueHandling.Ignore)>]
+    member val TodosEmbedded : List<Todo> = null with get, set
 
-    [<BsonElement("updatedAt")>]
-    [<JsonProperty("updatedAt")>]
-    [<BsonRepresentation(BsonType.DateTime)>]
-    UpdatedAt : DateTime
-}
+    [<BsonIgnore>]
+    [<JsonIgnore>]
+    static member val Relations : List<Relation> = relations with get
 
 type UserDto = {
     [<JsonProperty("id")>]
@@ -44,24 +49,12 @@ type UserDto = {
     [<JsonProperty("name")>]
     Name : string
 
+    [<JsonProperty("todosEmbedded")>]
+    TodosEmbedded : List<Todo>
+
     [<JsonProperty("createdAt")>]
     CreatedAt : DateTime
 
     [<JsonProperty("updatedAt")>]
     UpdatedAt : DateTime
 }
-
-module User =
-    
-    /// <summary>Set the minimum values to User object using smart constructor</summary>
-    /// <param name="user">User object</param>
-    /// <returns>User object</returns>
-    let setValuesToUser (user : User) =
-        {
-            Id = BsonObjectId(new ObjectId())
-            Email = user.Email
-            Name = user.Name
-            Password = user.Password
-            CreatedAt = DateTime.UtcNow
-            UpdatedAt = DateTime.UtcNow
-        }

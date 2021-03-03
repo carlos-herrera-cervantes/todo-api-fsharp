@@ -2,22 +2,19 @@ namespace TodoApi.Models
 
 open Microsoft.AspNetCore.Mvc
 
-type Request = {
+type Request () =
+
     [<FromQuery(Name = "sort")>]
-    Sort : string
+    member val Sort : string = "" with get, set
 
     [<FromQuery(Name = "pageSize")>]
-    PageSize : int
+    member val PageSize : int = 10 with get, set
 
     [<FromQuery(Name = "page")>]
-    Page : int
-
-    [<FromQuery(Name = "paginate")>]
-    Paginate : bool
+    member val Page : int = 0 with get, set
 
     [<FromQuery(Name = "relation")>]
-    Entities : string[]
+    member val Entities : string[] = Array.empty with get, set
 
     [<FromQuery(Name = "filter")>]
-    Filters : string[]
-}
+    member val Filters : string[] = Array.empty with get, set

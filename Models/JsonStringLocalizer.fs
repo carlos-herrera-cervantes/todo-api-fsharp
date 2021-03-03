@@ -12,9 +12,7 @@ type JsonStringLocalizer () =
 
     let mutable _localizers : List<Localizer> = new List<Localizer>()
 
-    do
-        let serializer = new JsonSerializer()
-        _localizers <- JsonConvert.DeserializeObject<List<Localizer>>(File.ReadAllText(@"localization.json"))
+    do _localizers <- JsonConvert.DeserializeObject<List<Localizer>>(File.ReadAllText(@"localization.json"))
 
     interface IStringLocalizer with
         member this.Item
@@ -29,7 +27,17 @@ type JsonStringLocalizer () =
                 new LocalizedString(name, value, resourceNotFound = false)
         
         member this.GetAllStrings (includeParentCultures: bool) =
-            let selecteds = _localizers.Where(fun l -> l.LocalizedValue.Keys.Any(fun lv -> lv = CultureInfo.CurrentCulture.Name)).Select(fun l -> new LocalizedString(l.Key, snd(l.LocalizedValue.TryGetValue(CultureInfo.CurrentCulture.Name)), true))
+            let selecteds = _localizers
+                                .Where(fun l -> 
+                                    l.LocalizedValue.Keys.Any(fun lv -> lv = CultureInfo.CurrentCulture.Name)
+                                )
+                                .Select(fun l ->
+                                    new LocalizedString(
+                                        l.Key,
+                                        snd(l.LocalizedValue.TryGetValue(CultureInfo.CurrentCulture.Name)),
+                                        true
+                                    )
+                                )
             selecteds
 
         member this.WithCulture (culture: CultureInfo) =
