@@ -86,6 +86,42 @@ type MongoDBDefinitions<'a> private () =
 
         result
 
+    /// <summary>Populate reference field</summary>
+    /// <param name="collection">Collection ued to create the fluent interface</param>
+    /// <param name="filter">Filter definition for match pipe</param>
+    /// <param name="relations">References to other collections</param>
+    /// <param name="request">Request object model</param>
+    /// <returns>Query to get documents and its references</returns>
+    static member PopulateSingular
+        (
+            collection : IMongoCollection<'a>,
+            filter : FilterDefinition<'a>,
+            relations : List<Relation>,
+            request : Request
+        )
+        =
+        let relation = relations.Find(fun r -> r.Entity = request.Entities.First().ToLower())
+        let localField = FieldDefinition<'a>.op_Implicit(relation.LocalKey)
+        let foreignField = FieldDefinition<BsonDocument>.op_Implicit(relation.ForeignKey)
+
+        let titleCaseAs = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(relation.Entity)
+        let as' = FieldDefinition<BsonDocument>.op_Implicit(sprintf "%sEmbedded" titleCaseAs)
+
+        let pipe = collection
+                    .Aggregate()
+                    .Match(filter)
+                    .Lookup(relation.Entity, localField, foreignField, as')
+
+        let result =
+            match relation.JustOne with
+            | true ->
+                pipe.Unwind(as').As<'a>()
+            | false ->
+                pipe.As<'a>()
+
+        result.FirstOrDefaultAsync()
+
+
     /// <summary>Generate the filter using lambda expression</summary>
     /// <param name="keys">The query string sended in the http request</param>
     /// <returns>Lambda expression builded</returns>

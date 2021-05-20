@@ -11,5 +11,6 @@ open TodoApi.Models
 type IRepository<'a> =
     abstract member GetAllAsync : Request -> List<Relation> -> Task<List<'a>>
     abstract member GetByIdAsync : Expression<Func<'a, bool>> -> Task<'a>
+    abstract member GetOneAndPopulateAsync : Request -> List<Relation> -> Task<'a>
     abstract member GetOneAsync : FilterDefinition<'a> -> Task<'a>
     abstract member CountAsync : Request -> Task<int64>

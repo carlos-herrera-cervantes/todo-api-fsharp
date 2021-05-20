@@ -24,6 +24,12 @@ type UserRepository private () =
     member this.GetByIdAsync(id: string) =
       this._userRepository.GetByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
 
+    /// <summary>Get a user by specific filter and their references</summary>
+    /// <param name="request">Request object model</param>
+    /// <returns>Specific user</returns>
+    member this.GetOneAndPopulateAsync(request : Request) =
+      this._userRepository.GetOneAndPopulateAsync(request)(User.Relations)
+
     /// <summary>Get one user by specific filter</summary>
     /// <param name="filter">A filter definition with fields to match with a document</param>
     /// <returns>Specific user</returns>
