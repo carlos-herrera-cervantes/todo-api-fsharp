@@ -1,23 +1,29 @@
 namespace TodoApi.Repositories
 
-open MongoDB.Driver
 open MongoDB.Bson
-open Microsoft.Extensions.Configuration
-open TodoApi.Infrastructure.Contexts
 open TodoApi.Models
 
 type TodoRepository private () =
 
-    member val _context : IMongoCollection<Todo> = null with get, set
-    member val _configuration : IConfiguration = null with get, set
+    member val _todoRepository : IRepository<Todo> = null with get, set
 
-    new (configuration : IConfiguration) as this =
-        TodoRepository() then
-        this._configuration <- configuration
-        let client = MongoDBFactory.CrateClient(this._configuration.GetSection("MongoDBSettings").GetSection("ConnectionString").Value)
-        let database = client.GetDatabase(this._configuration.GetSection("MongoDBSettings").GetSection("Database").Value)
-        this._context <- database.GetCollection<Todo>("todos")
+    new (todoRepository : IRepository<Todo>) as this = TodoRepository() then
+        this._todoRepository <- todoRepository
 
     interface ITodoRepository with
-        member this.GetAllAsync() = this._context.Find(fun entity -> true).ToListAsync()
-        member this.GetByIdAsync(id: string) = this._context.Find(fun entity -> entity.Id = BsonObjectId(new ObjectId(id))).FirstOrDefaultAsync()
+
+        /// <summary>Get list of todos</summary>
+        /// <param name="request">Request object model</param>
+        /// <returns>List of all todos</returns>
+        member this.GetAllAsync(request : Request) = this._todoRepository.GetAllAsync(request)(null)
+
+        /// <summary>Get a todo by specific ID</summary>
+        /// <param name="id">Todo ID</param>
+        /// <returns>Specific Todo</returns>
+        member this.GetByIdAsync(id: string) =
+            this._todoRepository.GetByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
+
+        /// <summary>Returns the number of documents in todos collection</summary>
+        /// <param name="request">Request object model</param>
+        /// <returns>Number of documents</returns>
+        member this.CountAsync(request : Request) = this._todoRepository.CountAsync(request)

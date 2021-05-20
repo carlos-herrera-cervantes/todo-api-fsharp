@@ -40,5 +40,33 @@
             "en": "The format of email is invalid",
             "es": "El formato del email es inválido"
         }
+    },
+    {
+        "Key": "TitleRequired",
+        "LocalizedValue": {
+            "en": "The title of to-do is required",
+            "es": "El título de la tarea es requerido"
+        }
+    },
+    {
+        "Key": "DescriptionRequired",
+        "LocalizedValue": {
+            "en": "The description of to-do is required",
+            "es": "La descripción de la tarea es requerido"
+        }
+    },
+    {
+        "Key": "UserRequired",
+        "LocalizedValue": {
+            "en": "The user who belongs the to-do is required",
+            "es": "El usuario al que le pertenece la tarea es requerido"
+        }
+    },
+    {
+        "Key": "NameRequired",
+        "LocalizedValue": {
+            "en": "The name of user is required",
+            "es": "El nombre de usuario es requerido"
+        }
     }
 ]

@@ -4,7 +4,7 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.JsonPatch
 open Microsoft.AspNetCore.Authorization
 open TodoApi.Models
-open TodoApi.Models.Todo
+open TodoApi.Models.Paginator
 open TodoApi.Managers
 open TodoApi.Repositories
 
@@ -17,16 +17,19 @@ type TodoController private () =
     member val _todoRepository : ITodoRepository = null with get, set
     member val _todoManager : ITodoManager = null with get, set
 
-    new (todoRepository : ITodoRepository, todoManager : ITodoManager) as this =
-        TodoController() then
+    new (todoRepository : ITodoRepository, todoManager : ITodoManager) as this = TodoController() then
         this._todoRepository <- todoRepository
         this._todoManager <- todoManager
 
     [<HttpGet>]
-    member this.Get () =
+    member this.Get ([<FromQuery>] request : Request) =
         async {
-            let! todos = this._todoRepository.GetAllAsync() |> Async.AwaitTask
-            let response = { Status = true; Data = todos; }
+            let! todos = this._todoRepository.GetAllAsync(request) |> Async.AwaitTask
+            let! totalDocs = this._todoRepository.CountAsync(request) |> Async.AwaitTask
+
+            let paginator = setObjectPaginator(request)(int(totalDocs))
+            let response = { Status = true; Data = todos; Paginator = paginator }
+
             return response |> this.Ok :> IActionResult
         }
 
@@ -41,9 +44,8 @@ type TodoController private () =
     [<HttpPost>]
     member this.Create (todo: Todo) =
         async {
-            let obj = setValuesToTodo todo
-            do! this._todoManager.CreateAsync obj |> Async.AwaitTask
-            let response = { Status = true; Data = obj; }
+            do! this._todoManager.CreateAsync todo |> Async.AwaitTask
+            let response = { Status = true; Data = todo; }
             return this.Created("", response) :> IActionResult
         }
 

@@ -1,50 +1,29 @@
 namespace TodoApi.Models
 
-open System
+open System.ComponentModel.DataAnnotations
 open MongoDB.Bson
 open MongoDB.Bson.Serialization.Attributes
 open Newtonsoft.Json
 
-[<CLIMutable>]
-type Todo = {
-    [<BsonElement("_id")>]
-    [<JsonProperty("id")>]
-    Id : BsonObjectId
+type Todo () =
+    inherit BaseEntity()
 
     [<BsonElement("title")>]
     [<JsonProperty("title")>]
-    Title : string
+    [<Required(ErrorMessage = "TitleRequired")>]
+    member val Title : string = null with get, set
 
     [<BsonElement("description")>]
     [<JsonProperty("description")>]
-    Description : string
+    [<Required(ErrorMessage = "DescriptionRequired")>]
+    member val Description : string = null with get, set
 
     [<BsonElement("done")>]
     [<JsonProperty("done")>]
-    Done : bool
+    member val Done : bool = false with get, set
 
-    [<BsonElement("createdAt")>]
-    [<JsonProperty("createdAt")>]
-    [<BsonRepresentation(BsonType.DateTime)>]
-    CreatedAt : DateTime
-
-    [<BsonElement("updatedAt")>]
-    [<JsonProperty("updatedAt")>]
-    [<BsonRepresentation(BsonType.DateTime)>]
-    UpdatedAt : DateTime
-}
-
-module Todo =
-
-    /// <summary>Set the minimum values to ToDo object using smart constructor</summary>
-    /// <param name="todo">ToDo object</param>
-    /// <returns>ToDo object</returns>
-    let setValuesToTodo todo =
-        {
-            Id = BsonObjectId(new ObjectId())
-            Title = todo.Title
-            Description = todo.Description
-            Done = false
-            CreatedAt = DateTime.UtcNow
-            UpdatedAt = DateTime.UtcNow
-        }
+    [<BsonElement("user")>]
+    [<BsonRepresentation(BsonType.ObjectId)>]
+    [<JsonProperty("user")>]
+    [<Required(ErrorMessage = "UserRequired")>]
+    member val User : string = null with get, set

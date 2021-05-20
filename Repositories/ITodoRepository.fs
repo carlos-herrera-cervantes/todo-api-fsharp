@@ -6,5 +6,6 @@ open TodoApi.Models
 
 [<AllowNullLiteral>]
 type ITodoRepository =
-    abstract member GetAllAsync : unit -> Task<List<Todo>>
+    abstract member GetAllAsync : Request -> Task<List<Todo>>
     abstract member GetByIdAsync : string -> Task<Todo>
+    abstract member CountAsync : Request -> Task<int64>

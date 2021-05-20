@@ -9,4 +9,5 @@ type JsonStringLocalizerFactory () =
 
         member this.Create(source: Type): IStringLocalizer = new JsonStringLocalizer() :> IStringLocalizer
 
-        member this.Create(baseName: string, location: string): IStringLocalizer = new JsonStringLocalizer() :> IStringLocalizer
+        member this.Create(baseName: string, location: string): IStringLocalizer =
+            new JsonStringLocalizer() :> IStringLocalizer

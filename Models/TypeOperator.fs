@@ -1,9 +1,9 @@
 namespace TodoApi.Models
 
-type TypeOperator<'a> = {
+type TypeOperator = {
     Key : string
 
     Operation : string
 
-    Value : 'a
+    Value : string
 }

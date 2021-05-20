@@ -8,7 +8,6 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Configuration
-open Microsoft.AspNetCore.Mvc.NewtonsoftJson
 open Microsoft.AspNetCore.Localization
 open Microsoft.Extensions.Localization
 open TodoApi.Managers
@@ -31,11 +30,13 @@ type Startup private () =
         services.AddControllers().AddNewtonsoftJson().AddDataAnnotationsLocalization(fun options -> 
             options.DataAnnotationLocalizerProvider <- Func<Type, IStringLocalizerFactory, IStringLocalizer>(fun _ factory -> factory.Create(typeof<SharedResources>))) |> ignore
         services.AddTokenAuthentication(this.Configuration) |> ignore
-        services.AddSingleton<IUserManager, UserManager>() |> ignore
+        services.AddScoped(typedefof<IManager<_>>, typedefof<Manager<_>>) |> ignore
+        services.AddScoped(typedefof<IRepository<_>>, typedefof<Repository<_>>) |> ignore
+        services.AddTransient<IUserManager, UserManager>() |> ignore
         services.AddSingleton<IConfiguration>(this.Configuration) |> ignore
-        services.AddSingleton<IUserRepository, UserRepository>() |> ignore
-        services.AddSingleton<ITodoRepository, TodoRepository>() |> ignore
-        services.AddSingleton<ITodoManager, TodoManager>() |> ignore
+        services.AddTransient<IUserRepository, UserRepository>() |> ignore
+        services.AddTransient<ITodoRepository, TodoRepository>() |> ignore
+        services.AddTransient<ITodoManager, TodoManager>() |> ignore
         services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>() |> ignore
         services.AddSingleton<IStringLocalizer, JsonStringLocalizer>() |> ignore
 

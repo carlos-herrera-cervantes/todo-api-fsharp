@@ -22,51 +22,67 @@ type AuthController private () =
     member val _configuration : IConfiguration = null with get, set
     member val _localizer : IStringLocalizer<SharedResources> = null with get, set
 
-    new (userRepository : IUserRepository, configuration : IConfiguration, localizer : IStringLocalizer<SharedResources>) as this =
-        AuthController() then
+    new (
+            userRepository : IUserRepository,
+            configuration : IConfiguration,
+            localizer : IStringLocalizer<SharedResources>
+        ) as this = AuthController() then
         this._userRepository <- userRepository
         this._configuration <- configuration
         this._localizer <- localizer
 
     [<HttpPost("sign-in")>]
-    member __.SignIn (credentials : Credentials) =
+    member this.SignIn (credentials : Credentials) =
         async {
             let filter = Builders<User>.Filter.Where(fun u -> u.Email = credentials.Email)
-            let! user = __._userRepository.GetOneAsync filter |> Async.AwaitTask
+            let! user = this._userRepository.GetOneAsync filter |> Async.AwaitTask
             
             let result = 
                 match box user with
                 | null ->
-                    let firstValidation = { Status = false; Message = __._localizer.Item("UserNotFound").Value; Code = "UserNotFound"; }
+                    let firstValidation = {
+                        Status = false
+                        Message = this._localizer.Item("UserNotFound").Value
+                        Code = "UserNotFound"
+                    }
                     firstValidation |> NotFoundObjectResult :> IActionResult
                 | _ ->
                     let isSame = credentials.Password = user.Password
                     
                     match isSame with
                     | true ->
-                        let token = __.GenerateToken credentials
+                        let token = this.GenerateToken credentials
                         let response = { Status = true; Data = token; }
                         response |> OkObjectResult :> IActionResult
                     | false ->
-                        let secondValidation = { Status = false; Message = __._localizer.Item("InvalidCredentials").Value; Code = "InvalidCredentials"; }
+                        let secondValidation = {
+                            Status = false
+                            Message = this._localizer.Item("InvalidCredentials").Value
+                            Code = "InvalidCredentials"
+                        }
                         secondValidation |> BadRequestObjectResult :> IActionResult
 
             return result
         }
 
     [<HttpPost("logout")>]
-    member __.Logout () =
-        __.NoContent() :> IActionResult
+    member this.Logout () =
+        this.NoContent() :> IActionResult
 
     /// <summary>Generate the Json Web Token</summary>
     /// <param name="credentials">User's email and password</param>
     /// <returns>Json Web Token</returns>
-    member private __.GenerateToken (credentials : Credentials) =
+    member private this.GenerateToken (credentials : Credentials) =
         let claims = ClaimsIdentity([| Claim(ClaimTypes.Email, credentials.Email) |])
         let tokenDescriptor = 
             SecurityTokenDescriptor(
                 Subject = claims,
-                SigningCredentials = SigningCredentials(SymmetricSecurityKey(Encoding.ASCII.GetBytes(__._configuration.GetValue<string>("SecretKey"))), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = SigningCredentials(
+                    SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(this._configuration.GetValue<string>("SecretKey"))
+                    ),
+                    SecurityAlgorithms.HmacSha256Signature
+                ),
                 Expires = Nullable(DateTime.UtcNow.AddDays(5.0))
             )
         let tokenHandler = JwtSecurityTokenHandler()
