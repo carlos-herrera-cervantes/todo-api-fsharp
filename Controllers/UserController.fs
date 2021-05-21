@@ -45,9 +45,11 @@ type UserController private () =
 
     [<HttpGet("{id}")>]
     [<UserExists>]
-    member this.GetById (id: string) =
+    member this.GetById (id: string, [<FromQuery>] request : Request) =
         async {
-            let! user = this._userRepository.GetByIdAsync id |> Async.AwaitTask
+            request.Filters <- request.Filters + sprintf "id=%s" id
+
+            let! user = this._userRepository.GetOneAndPopulateAsync request |> Async.AwaitTask
             let dto = this._mapper.Map<UserDto>(user)
             let response = { Status = true; Data = dto; }
             return response |> this.Ok :> IActionResult

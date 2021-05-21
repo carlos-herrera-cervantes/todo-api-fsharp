@@ -8,7 +8,6 @@ open MongoDB.Bson
 open Microsoft.Extensions.Configuration
 open TodoApi.Infrastructure.Contexts
 open TodoApi.Models
-open TodoApi.Extensions.ArrayManipulation
 
 type Repository<'a> private () =
 
@@ -38,7 +37,7 @@ type Repository<'a> private () =
             request.Page <- if request.Page <= 1 then 0 else request.Page - 1
 
             let result =
-                match entities.IsEmpty() || relations = null with
+                match String.IsNullOrEmpty(entities) || relations = null with
                 | true ->
                   let sortTypedFilter = MongoDBDefinitions<'a>.BuildSortFilter(request.Sort)
                   this._context
@@ -60,6 +59,22 @@ type Repository<'a> private () =
         /// <returns>Document</returns>
         member this.GetByIdAsync(expression : Expression<Func<'a, bool>>) =
           this._context.Find(expression).FirstOrDefaultAsync()
+
+        /// <summary>Get a document by specific ID and their references</summary>
+        /// <param name="request">Request object model</param>
+        /// <param name="relations">References to other documents</param>
+        /// <returns>Document</returns>
+        member this.GetOneAndPopulateAsync(request : Request)(relations : List<Relation>) =
+          let filter = MongoDBDefinitions<'a>.BuildFilter(request)
+          let entities = request.Entities
+          let result =
+                match String.IsNullOrEmpty(entities) || relations = null with
+                | true ->
+                  this._context.Find(filter).FirstOrDefaultAsync()
+                | false ->
+                  MongoDBDefinitions<'a>.PopulateSingular(this._context, filter, relations, request)
+
+          result
 
         /// <summary>Get one document by specific filter</summary>
         /// <param name="filter">A filter definition with fields to match with a document</param>

@@ -14,7 +14,7 @@ type Request () =
     member val Page : int = 0 with get, set
 
     [<FromQuery(Name = "relation")>]
-    member val Entities : string[] = Array.empty with get, set
+    member val Entities : string = "" with get, set
 
     [<FromQuery(Name = "filter")>]
-    member val Filters : string[] = Array.empty with get, set
+    member val Filters : string = "" with get, set
