@@ -8,7 +8,6 @@ open MongoDB.Bson
 open Microsoft.Extensions.Configuration
 open TodoApi.Infrastructure.Contexts
 open TodoApi.Models
-open TodoApi.Extensions.ArrayManipulation
 
 type Repository<'a> private () =
 
@@ -38,7 +37,7 @@ type Repository<'a> private () =
             request.Page <- if request.Page <= 1 then 0 else request.Page - 1
 
             let result =
-                match entities.IsEmpty() || relations = null with
+                match String.IsNullOrEmpty(entities) || relations = null with
                 | true ->
                   let sortTypedFilter = MongoDBDefinitions<'a>.BuildSortFilter(request.Sort)
                   this._context
@@ -68,9 +67,8 @@ type Repository<'a> private () =
         member this.GetOneAndPopulateAsync(request : Request)(relations : List<Relation>) =
           let filter = MongoDBDefinitions<'a>.BuildFilter(request)
           let entities = request.Entities
-
           let result =
-                match entities.IsEmpty() || relations = null with
+                match String.IsNullOrEmpty(entities) || relations = null with
                 | true ->
                   this._context.Find(filter).FirstOrDefaultAsync()
                 | false ->

@@ -47,7 +47,7 @@ type UserController private () =
     [<UserExists>]
     member this.GetById (id: string, [<FromQuery>] request : Request) =
         async {
-            request.Filters.Append(sprintf "id=%s" id) |> ignore
+            request.Filters <- request.Filters + sprintf "id=%s" id
 
             let! user = this._userRepository.GetOneAndPopulateAsync request |> Async.AwaitTask
             let dto = this._mapper.Map<UserDto>(user)

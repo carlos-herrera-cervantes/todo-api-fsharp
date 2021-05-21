@@ -7,10 +7,10 @@ open System.Linq.Expressions
 open System.Collections.Generic
 open System.Linq
 open System.Globalization
+open System.Text.RegularExpressions
 open TodoApi.Models
 open TodoApi.Constants
 open TodoApi.Extensions.StringExtensions
-open TodoApi.Extensions.ArrayManipulation
 
 type MongoDBDefinitions<'a> private () =
 
@@ -20,7 +20,7 @@ type MongoDBDefinitions<'a> private () =
     static member BuildFilter(request : Request) =
         let filters = request.Filters
         let builder =
-            match filters.IsEmpty() with
+            match String.IsNullOrEmpty(filters) with
             | true ->
                 Builders<'a>.Filter.Empty
             | false ->
@@ -62,7 +62,8 @@ type MongoDBDefinitions<'a> private () =
             relations : List<Relation>,
             request : Request
         ) =
-        let relation = relations.Find(fun r -> r.Entity = request.Entities.First().ToLower())
+        let entities = request.Entities.Split(',')
+        let relation = relations.Find(fun r -> r.Entity = entities.First().ToLower())
         let localField = FieldDefinition<'a>.op_Implicit(relation.LocalKey)
         let foreignField = FieldDefinition<BsonDocument>.op_Implicit(relation.ForeignKey)
 
@@ -100,7 +101,8 @@ type MongoDBDefinitions<'a> private () =
             request : Request
         )
         =
-        let relation = relations.Find(fun r -> r.Entity = request.Entities.First().ToLower())
+        let entities = request.Entities.Split(',')
+        let relation = relations.Find(fun r -> r.Entity = entities.First().ToLower())
         let localField = FieldDefinition<'a>.op_Implicit(relation.LocalKey)
         let foreignField = FieldDefinition<BsonDocument>.op_Implicit(relation.ForeignKey)
 
@@ -125,9 +127,8 @@ type MongoDBDefinitions<'a> private () =
     /// <summary>Generate the filter using lambda expression</summary>
     /// <param name="keys">The query string sended in the http request</param>
     /// <returns>Lambda expression builded</returns>
-    static member GenerateFilter(keys : string[]) =
-        let firstElement = keys.First()
-        let keyValues = firstElement.Split(',')
+    static member GenerateFilter(keys : string) =
+        let keyValues = keys.Split(',')
         let operators = keyValues.Select(Func<string, TypeOperator>(fun key -> key.ClassifyOperation()))
         let parameterExpression = Expression.Parameter(typeof<'a>, "entity")
         let lambda = MongoDBDefinitions<'a>.BuildExpression(parameterExpression, operators)
@@ -141,9 +142,14 @@ type MongoDBDefinitions<'a> private () =
     static member BuildExpression(expression : ParameterExpression, operators : IEnumerable<TypeOperator>) =
         let operations = new Dictionary<int, Expression>()
         let mutable counter = 1
+        let regex = new Regex(@"^[0-9a-fA-F]{24}$")
 
         for i in operators do
-            let constant = Expression.Constant(i.Value)
+            let constant =
+                match regex.IsMatch(i.Value) with
+                | true -> Expression.Constant(BsonObjectId(new ObjectId(i.Value)))
+                | false -> Expression.Constant(i.Value)
+
             let property = Expression.Property(expression, i.Key)
             operations.Add(counter, MongoDBDefinitions<'a>.GenerateTypeExpression(property, constant, i))
             counter <- counter + 1
