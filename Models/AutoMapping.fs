@@ -1,9 +1,12 @@
 namespace TodoApi.Models
 
 open AutoMapper
-open System.Collections.Generic
 
 type AutoMapping() as this =
     inherit Profile()
 
-    do this.CreateMap<User, UserDto>().PreserveReferences() |> ignore
+    do
+        this.CreateMap<User, SingleUserDto>().PreserveReferences() |> ignore
+        this.CreateMap<User, CreateUserDto>().PreserveReferences() |> ignore
+        this.CreateMap<CreateUserDto, SingleUserDto>() |> ignore
+        this.CreateMap<CreateUserDto, User>() |> ignore

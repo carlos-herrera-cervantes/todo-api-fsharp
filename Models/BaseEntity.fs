@@ -5,11 +5,14 @@ open MongoDB.Bson
 open MongoDB.Bson.Serialization.Attributes
 open Newtonsoft.Json
 
+[<AllowNullLiteral>]
 type BaseEntity () =
 
     [<BsonElement("_id")>]
     [<JsonProperty("id")>]
-    member val Id : BsonObjectId = null with get, set
+    [<BsonId>]
+    [<BsonRepresentation(BsonType.ObjectId)>]
+    member val Id : string = null with get, set
 
     [<BsonElement("createdAt")>]
     [<JsonProperty("createdAt")>]

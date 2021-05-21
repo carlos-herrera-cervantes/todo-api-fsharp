@@ -1,12 +1,15 @@
 namespace TodoApi.Models
 
+open Newtonsoft.Json
 open System.ComponentModel.DataAnnotations
 
-type Credentials = {
+type Credentials () =
+
+    [<JsonProperty("email")>]
     [<Required(ErrorMessage = "EmailRequired")>]
     [<DataType(DataType.EmailAddress, ErrorMessage = "EmailFormatInvalid")>]
-    Email : string
+    member val Email : string = null with get, set
 
+    [<JsonProperty("password")>]
     [<Required(ErrorMessage = "PasswordRequired")>]
-    Password : string
-}
+    member val Password : string = null with get, set
