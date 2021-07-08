@@ -17,6 +17,7 @@ open TodoApi.Models
 open TodoApi.Extensions.TokenAuthentication
 open TodoApi.Extensions.AutoMapperExtensions
 open TodoApi.Extensions.SwaggerExtensions
+open TodoApi.Middlewares
 
 type Startup private () =
 
@@ -55,6 +56,7 @@ type Startup private () =
         cultures.Add(CultureInfo("en"))
         cultures.Add(CultureInfo("es"))
 
+        app.UseMiddleware<SecurityHeadersMiddleware>() |> ignore
         app.UseRequestLocalization(Action<RequestLocalizationOptions>(fun options ->
             options.DefaultRequestCulture <- RequestCulture("en")
             options.SupportedCultures <- cultures
