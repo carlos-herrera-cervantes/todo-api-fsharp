@@ -5,6 +5,7 @@ open System.Linq.Expressions
 open MongoDB.Driver
 open Microsoft.Extensions.Configuration
 open TodoApi.Infrastructure.Contexts
+open TodoApi.Models
 
 type Manager<'a> private () =
 
@@ -31,7 +32,20 @@ type Manager<'a> private () =
         /// <summary>Deletes a document</summary>
         /// <param name="expression">LINQ expression to apply</param>
         /// <returns>Removal result</returns>
-        member this.DeleteByIdAsync(expression : Expression<Func<'a, bool>>) = this._context.DeleteOneAsync(expression)
+        member this.DeleteByIdAsync(expression : Expression<Func<'a, bool>>) = this._context.DeleteOneAsync expression
+
+        /// <summary>Deletes a list of documents</summary>
+        /// <param name="request">Request object model</param>
+        /// <returns>Removal result</returns>
+        member this.DeleteManyAsync(request : Request) =
+            let filter  = MongoDBDefinitions<'a>.BuildFilter(request)
+            this._context.DeleteManyAsync filter
+
+        /// <summary>Deletes a list of documents</summary>
+        /// <param name="filter">Filter definition</param>
+        /// <returns>Removal result</returns>
+        member this.DeleteManyAsync(filter : FilterDefinition<'a>) =
+            this._context.DeleteManyAsync filter
 
         /// <summary>Updates a document</summary>
         /// <param name="filter">FilterDefinition instance</param>

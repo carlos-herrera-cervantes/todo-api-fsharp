@@ -7,23 +7,27 @@
   <ItemGroup>
     <Compile Include="SharedResources.fs" />
     <Compile Include="Constants/Operators.fs" />
+    <Compile Include="Constants/Roles.fs" />
     <Compile Include="Models/BaseEntity.fs" />
     <Compile Include="Models/Relation.fs" />
     <Compile Include="Models/TypeOperator.fs" />
     <Compile Include="Models/Request.fs" />
     <Compile Include="Models/Paginator.fs" />
+    <Compile Include="Models/Response.fs" />
     <Compile Include="Models/Credentials.fs" />
     <Compile Include="Models/Todo.fs" />
     <Compile Include="Models/User.fs" />
+    <Compile Include="Models/AccessToken.fs" />
     <Compile Include="Models/Localizer.fs" />
     <Compile Include="Models/JsonStringLocalizer.fs" />
     <Compile Include="Models/JsonStringLocalizerFactory.fs" />
     <Compile Include="Models/AutoMapping.fs" />
-    <Compile Include="Models/Response.fs" />
     <Compile Include="Extensions/ArrayExtensions.fs" />
     <Compile Include="Extensions/AutoMapperExtensions.fs" />
     <Compile Include="Extensions/AuthenticationExtensions.fs" />
     <Compile Include="Extensions/StringExtensions.fs" />
+    <Compile Include="Extensions/HeaderDictionaryExtensions.fs" />
+    <Compile Include="Extensions/SwaggerExtensions.fs" />
     <Compile Include="Infrastructure/MongoDBFactory.fs" />
     <Compile Include="Infrastructure/MongoDBDefinitions.fs" />
     <Compile Include="Managers/IManager.fs" />
@@ -32,16 +36,23 @@
     <Compile Include="Managers/UserManager.fs" />
     <Compile Include="Managers/ITodoManager.fs" />
     <Compile Include="Managers/TodoManager.fs" />
+    <Compile Include="Managers/IAccessTokenManager.fs" />
+    <Compile Include="Managers/AccessTokenManager.fs" />
     <Compile Include="Repositories/IRepository.fs" />
     <Compile Include="Repositories/Repository.fs" />
     <Compile Include="Repositories/IUserRepository.fs" />
     <Compile Include="Repositories/UserRepository.fs" />
     <Compile Include="Repositories/ITodoRepository.fs" />
     <Compile Include="Repositories/TodoRepository.fs" />
+    <Compile Include="Repositories/IAccessTokenRepository.fs" />
+    <Compile Include="Repositories/AccessTokenRepository.fs" />
+    <Compile Include="Attributes/RoleAttribute.fs" />
     <Compile Include="Attributes/UserExistsAttribute.fs" />
+    <Compile Include="Attributes/TodoExistsAttribute.fs" />
     <Compile Include="Controllers/AuthController.fs" />
     <Compile Include="Controllers/UserController.fs" />
     <Compile Include="Controllers/TodoController.fs" />
+    <Compile Include="Hooks/Seeder.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
@@ -50,5 +61,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.6.3" />
   </ItemGroup>
 </Project>

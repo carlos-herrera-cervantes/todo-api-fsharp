@@ -1,16 +1,18 @@
 namespace TodoApi.Managers
 
+open AutoMapper
 open MongoDB.Driver
-open MongoDB.Bson
 open Microsoft.AspNetCore.JsonPatch
 open TodoApi.Models
 
 type UserManager private () =
   
   member val _userManager : IManager<User> = null with get, set
+  member val _mapper : IMapper = null with get, set
 
-  new (userManager : IManager<User>) as this = UserManager() then
+  new (userManager : IManager<User>, mapper : IMapper) as this = UserManager() then
     this._userManager <- userManager
+    this._mapper <- mapper
 
   interface IUserManager with
 
@@ -23,7 +25,7 @@ type UserManager private () =
     /// <param name="id">Document ID</param>
     /// <returns>Removal result</returns>
     member this.DeleteByIdAsync(id: string) =
-      this._userManager.DeleteByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
+      this._userManager.DeleteByIdAsync(fun entity -> entity.Id = id)
 
     /// <summary>Updates a user</summary>
     /// <param name="id">User ID</param>
@@ -32,6 +34,10 @@ type UserManager private () =
     /// <returns>User</returns>
     member this.UpdateByIdAsync(id: string)(newUser: User)(currentUser: JsonPatchDocument<User>) =
         currentUser.ApplyTo(newUser)
-        let filter = Builders<User>.Filter.Eq((fun entity -> entity.Id), BsonObjectId(new ObjectId(id)))
-        let options = new ReplaceOptions(IsUpsert = true)
-        this._userManager.UpdateOneAsync(filter)(newUser)(options)
+
+        let filter = Builders<User>.Filter.Eq((fun entity -> entity.Id), id)
+        let options = ReplaceOptions(IsUpsert = true)
+        let user = this._mapper.Map<User>(newUser)
+
+        this._userManager.UpdateOneAsync(filter)(user)(options)
+

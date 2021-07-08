@@ -3,6 +3,7 @@
 open System
 open System.Linq
 open System.Text.RegularExpressions
+open System.IdentityModel.Tokens.Jwt
 open TodoApi.Constants
 open TodoApi.Models
 
@@ -52,3 +53,16 @@ module StringExtensions =
                     }
 
             pattern
+
+        /// <summary>Takes the value of claim entered by the user</summary>
+        /// <param name="key">Claim name</param>
+        /// <returns>Value of claim</returns>
+        member this.SelectClaim(key : string) =
+            let handler = JwtSecurityTokenHandler()
+            let decoded = handler.ReadJwtToken(this)
+            let selected = decoded.Claims.ToList()
+                            .Where(fun claim -> claim.Type = key)
+                            .Select(fun claim -> claim.Value)
+                            .SingleOrDefault()
+
+            selected

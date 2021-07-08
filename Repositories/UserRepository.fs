@@ -22,7 +22,7 @@ type UserRepository private () =
     /// <param name="id">User ID</param>
     /// <returns>Specific user</returns>
     member this.GetByIdAsync(id: string) =
-      this._userRepository.GetByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
+      this._userRepository.GetByIdAsync(fun entity -> entity.Id = id)
 
     /// <summary>Get a user by specific filter and their references</summary>
     /// <param name="request">Request object model</param>
@@ -39,3 +39,7 @@ type UserRepository private () =
     /// <param name="request">Request object model</param>
     /// <returns>Number of documents</returns>
     member this.CountAsync(request : Request) = this._userRepository.CountAsync(request)
+
+    /// <summary>Returns the number of documents in users collection</summary>
+    /// <returns>Number of documents</returns>
+    member this.CountAsync() = this._userRepository.CountAsync()

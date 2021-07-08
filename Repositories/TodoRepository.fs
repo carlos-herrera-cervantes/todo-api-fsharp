@@ -21,7 +21,7 @@ type TodoRepository private () =
         /// <param name="id">Todo ID</param>
         /// <returns>Specific Todo</returns>
         member this.GetByIdAsync(id: string) =
-            this._todoRepository.GetByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
+            this._todoRepository.GetByIdAsync(fun entity -> entity.Id = id)
 
         /// <summary>Returns the number of documents in todos collection</summary>
         /// <param name="request">Request object model</param>

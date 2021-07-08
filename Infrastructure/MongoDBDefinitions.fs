@@ -7,7 +7,6 @@ open System.Linq.Expressions
 open System.Collections.Generic
 open System.Linq
 open System.Globalization
-open System.Text.RegularExpressions
 open TodoApi.Models
 open TodoApi.Constants
 open TodoApi.Extensions.StringExtensions
@@ -142,14 +141,9 @@ type MongoDBDefinitions<'a> private () =
     static member BuildExpression(expression : ParameterExpression, operators : IEnumerable<TypeOperator>) =
         let operations = new Dictionary<int, Expression>()
         let mutable counter = 1
-        let regex = new Regex(@"^[0-9a-fA-F]{24}$")
 
         for i in operators do
-            let constant =
-                match regex.IsMatch(i.Value) with
-                | true -> Expression.Constant(BsonObjectId(new ObjectId(i.Value)))
-                | false -> Expression.Constant(i.Value)
-
+            let constant = Expression.Constant(i.Value)
             let property = Expression.Property(expression, i.Key)
             operations.Add(counter, MongoDBDefinitions<'a>.GenerateTypeExpression(property, constant, i))
             counter <- counter + 1

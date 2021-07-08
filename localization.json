@@ -7,6 +7,13 @@
         }
     },
     {
+        "Key": "TodoNotFound",
+        "LocalizedValue": {
+            "en": "Todo not found",
+            "es": "Tarea no encontrado"
+        }
+    },
+    {
         "Key": "InvalidObjectId",
         "LocalizedValue": {
             "en": "The ID is not valid",
@@ -67,6 +74,13 @@
         "LocalizedValue": {
             "en": "The name of user is required",
             "es": "El nombre de usuario es requerido"
+        }
+    },
+    {
+        "Key": "InvalidOperation",
+        "LocalizedValue": {
+            "en": "Invalid operation",
+            "es": "Operación inválida"
         }
     }
 ]

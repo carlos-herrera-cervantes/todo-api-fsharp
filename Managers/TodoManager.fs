@@ -1,7 +1,6 @@
 namespace TodoApi.Managers
 
 open MongoDB.Driver
-open MongoDB.Bson
 open Microsoft.AspNetCore.JsonPatch
 open TodoApi.Models
 
@@ -23,7 +22,7 @@ type TodoManager private () =
         /// <param name="id">Document ID</param>
         /// <returns>Removal result</returns>
         member this.DeleteByIdAsync(id: string) =
-            this._todoManager.DeleteByIdAsync(fun entity -> entity.Id = BsonObjectId(new ObjectId(id)))
+            this._todoManager.DeleteByIdAsync(fun entity -> entity.Id = id)
 
         /// <summary>Updates a todo</summary>
         /// <param name="id">Todo ID</param>
@@ -32,6 +31,6 @@ type TodoManager private () =
         /// <returns>Todo</returns>
         member this.UpdateByIdAsync(id: string)(newTodo: Todo)(currentTodo: JsonPatchDocument<Todo>) =
             currentTodo.ApplyTo(newTodo)
-            let filter = Builders<Todo>.Filter.Eq((fun entity -> entity.Id), BsonObjectId(new ObjectId(id)))
-            let options = new ReplaceOptions(IsUpsert = true)
+            let filter = Builders<Todo>.Filter.Eq((fun entity -> entity.Id), id)
+            let options = ReplaceOptions(IsUpsert = true)
             this._todoManager.UpdateOneAsync(filter)(newTodo)(options)

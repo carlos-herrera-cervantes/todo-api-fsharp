@@ -37,7 +37,7 @@ type Repository<'a> private () =
             request.Page <- if request.Page <= 1 then 0 else request.Page - 1
 
             let result =
-                match String.IsNullOrEmpty(entities) || relations = null with
+                match String.IsNullOrEmpty(entities) || isNull relations with
                 | true ->
                   let sortTypedFilter = MongoDBDefinitions<'a>.BuildSortFilter(request.Sort)
                   this._context
@@ -68,7 +68,7 @@ type Repository<'a> private () =
           let filter = MongoDBDefinitions<'a>.BuildFilter(request)
           let entities = request.Entities
           let result =
-                match String.IsNullOrEmpty(entities) || relations = null with
+                match String.IsNullOrEmpty(entities) || isNull relations with
                 | true ->
                   this._context.Find(filter).FirstOrDefaultAsync()
                 | false ->
@@ -87,3 +87,7 @@ type Repository<'a> private () =
         member this.CountAsync(request : Request) =
           let filter = MongoDBDefinitions<'a>.BuildFilter(request)
           this._context.CountDocumentsAsync(filter)
+
+        /// <summary>Returns the number of documents in a specific collection</summary>
+        /// <returns>Number of documents</returns>
+        member this.CountAsync() = this._context.CountDocumentsAsync(Builders<'a>.Filter.Empty)

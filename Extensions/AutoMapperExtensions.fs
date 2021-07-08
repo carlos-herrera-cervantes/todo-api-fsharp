@@ -10,7 +10,7 @@ module AutoMapperExtensions =
     type IServiceCollection with
         
         member this.AddAutoMapperConfiguration(configuration : IConfiguration) =
-            let mapperConfig = new MapperConfiguration(fun mc -> mc.AddProfile(new AutoMapping()))
+            let mapperConfig = MapperConfiguration(fun mc -> mc.AddProfile(AutoMapping()))
             let mapper = mapperConfig.CreateMapper()
 
             this.AddSingleton(mapper) |> ignore

@@ -1,28 +1,28 @@
 namespace TodoApi.Attributes
 
 open System
-open System.Threading.Tasks
+open Microsoft.Extensions.Localization
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Mvc.Filters
-open Microsoft.Extensions.Localization
+open System.Threading.Tasks
+open TodoApi.Repositories
 open TodoApi.Extensions.HeaderDictionaryExtensions
 open TodoApi.Extensions.StringExtensions
-open TodoApi.Repositories
 open TodoApi.Models
 open TodoApi
 
-type UserExistsFilter private () =
+type TodoExistsFilter private () =
 
-    member val _userRepository : IUserRepository = null with get, set
+    member val _todoRepository : ITodoRepository = null with get, set
     member val _localizer : IStringLocalizer<SharedResources> = null with get, set
 
     new (
-            userRepository : IUserRepository,
+            todoRepository : ITodoRepository,
             localizer : IStringLocalizer<SharedResources>
-        ) as this = UserExistsFilter() then
-        this._userRepository <- userRepository
+        ) as this = TodoExistsFilter() then
+        this._todoRepository <- todoRepository
         this._localizer <- localizer
-
+    
     interface IAsyncActionFilter with
 
         member this.OnActionExecutionAsync(context: ActionExecutingContext, next: ActionExecutionDelegate) =
@@ -30,25 +30,25 @@ type UserExistsFilter private () =
                 try
                     let pair = context.ActionArguments.TryGetValue("id")
                     let id = snd pair
-                    let! user = this._userRepository.GetByIdAsync(id.ToString()) |> Async.AwaitTask
+                    let! todo = this._todoRepository.GetByIdAsync(id.ToString()) |> Async.AwaitTask
 
                     let token = context.HttpContext.Request.Headers.ExtractJsonWebToken()
                     let sub = token.SelectClaim("nameid")
-                    
-                    if (isNull user) then
+
+                    if (isNull todo) then
                         let firstValidation = FailResponse()
                         firstValidation.Status <- false
-                        firstValidation.Message <- this._localizer.Item("UserNotFound").Value
-                        firstValidation.Code <- "UserNotFound"
-                        
+                        firstValidation.Message <- this._localizer.Item("TodoNotFound").Value
+                        firstValidation.Code <- "TodoNotFound"
+
                         context.Result <- firstValidation |> NotFoundObjectResult
-                    elif (sub <> user.Id) then
+                    elif (sub <> todo.User) then
                         let thirdValidation = FailResponse()
                         thirdValidation.Status <- false
                         thirdValidation.Message <- this._localizer.Item("InvalidOperation").Value
                         thirdValidation.Code <- "InvalidOperation"
-                        
-                        context.Result <- thirdValidation |> NotFoundObjectResult
+
+                        context.Result <- thirdValidation |> BadRequestObjectResult
                     else
                         do! next.Invoke() :> Task |> Async.AwaitTask
                 with
@@ -61,6 +61,6 @@ type UserExistsFilter private () =
                     context.Result <- secondValidation |> BadRequestObjectResult
             }
             |> Async.StartAsTask :> Task
-            
-type UserExistsAttribute() =
-    inherit TypeFilterAttribute(typeof<UserExistsFilter>)
+
+type TodoExistsAttribute () =
+    inherit TypeFilterAttribute(typeof<TodoExistsFilter>)

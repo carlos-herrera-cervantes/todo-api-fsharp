@@ -2,6 +2,7 @@ namespace TodoApi.Models
 
 open Microsoft.AspNetCore.Mvc
 
+[<AllowNullLiteral>]
 type Request () =
 
     [<FromQuery(Name = "sort")>]

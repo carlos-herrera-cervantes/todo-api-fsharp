@@ -18,13 +18,13 @@ type JsonStringLocalizer () =
         member this.Item
             with get(name: string) =
                 let value = this.GetString(name)
-                new LocalizedString(name, value, resourceNotFound = false)
+                LocalizedString(name, value, resourceNotFound = false)
 
         member this.Item
             with get(name: string, [<ParamArray>] arguments: Object[]) =
                 let format = this.GetString(name)
                 let value = String.Format(format, arguments)
-                new LocalizedString(name, value, resourceNotFound = false)
+                LocalizedString(name, value, resourceNotFound = false)
         
         member this.GetAllStrings (includeParentCultures: bool) =
             let selecteds = _localizers
@@ -32,7 +32,7 @@ type JsonStringLocalizer () =
                                     l.LocalizedValue.Keys.Any(fun lv -> lv = CultureInfo.CurrentCulture.Name)
                                 )
                                 .Select(fun l ->
-                                    new LocalizedString(
+                                    LocalizedString(
                                         l.Key,
                                         snd(l.LocalizedValue.TryGetValue(CultureInfo.CurrentCulture.Name)),
                                         true
@@ -41,7 +41,7 @@ type JsonStringLocalizer () =
             selecteds
 
         member this.WithCulture (culture: CultureInfo) =
-            new JsonStringLocalizer() :> IStringLocalizer
+            JsonStringLocalizer() :> IStringLocalizer
 
     member this.GetString (name: string) =
         let query = _localizers.Where(fun l -> l.LocalizedValue.Keys.Any(fun lv -> lv = CultureInfo.CurrentCulture.Name))
