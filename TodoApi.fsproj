@@ -53,6 +53,7 @@
     <Compile Include="Controllers/UserController.fs" />
     <Compile Include="Controllers/TodoController.fs" />
     <Compile Include="Hooks/Seeder.fs" />
+    <Compile Include="Middlewares/SecurityHeadersMiddleware.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
