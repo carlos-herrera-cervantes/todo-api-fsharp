@@ -1,7 +1,6 @@
 namespace TodoApi.Repositories
 
 open MongoDB.Driver
-open MongoDB.Bson
 open TodoApi.Models
 
 type UserRepository private () =

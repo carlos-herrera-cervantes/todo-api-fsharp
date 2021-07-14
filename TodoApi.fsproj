@@ -32,6 +32,8 @@
     <Compile Include="Infrastructure/MongoDBDefinitions.fs" />
     <Compile Include="Managers/IManager.fs" />
     <Compile Include="Managers/Manager.fs" />
+    <Compile Include="Managers/IPasswordHasherManager.fs" />
+    <Compile Include="Managers/PasswordHasherManager.fs" />
     <Compile Include="Managers/IUserManager.fs" />
     <Compile Include="Managers/UserManager.fs" />
     <Compile Include="Managers/ITodoManager.fs" />
@@ -56,6 +58,7 @@
     <Compile Include="Middlewares/SecurityHeadersMiddleware.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />

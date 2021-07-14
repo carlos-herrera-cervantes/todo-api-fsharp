@@ -9,6 +9,7 @@ open TodoApi.Extensions.HeaderDictionaryExtensions
 open TodoApi.Extensions.StringExtensions
 open TodoApi.Repositories
 open TodoApi.Models
+open TodoApi.Constants
 open TodoApi
 
 type UserExistsFilter private () =
@@ -34,6 +35,7 @@ type UserExistsFilter private () =
 
                     let token = context.HttpContext.Request.Headers.ExtractJsonWebToken()
                     let sub = token.SelectClaim("nameid")
+                    let role = token.SelectClaim("role")
                     
                     if (isNull user) then
                         let firstValidation = FailResponse()
@@ -42,7 +44,7 @@ type UserExistsFilter private () =
                         firstValidation.Code <- "UserNotFound"
                         
                         context.Result <- firstValidation |> NotFoundObjectResult
-                    elif (sub <> user.Id) then
+                    elif (sub <> user.Id && role <> Roles.SuperAdmin) then
                         let thirdValidation = FailResponse()
                         thirdValidation.Status <- false
                         thirdValidation.Message <- this._localizer.Item("InvalidOperation").Value
