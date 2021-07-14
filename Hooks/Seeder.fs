@@ -14,6 +14,7 @@ type Seeder private () =
         async {
             use scope = serviceProvider.CreateScope()
 
+            scope.ServiceProvider.GetRequiredService<IPasswordHasherManager>() |> ignore
             scope.ServiceProvider.GetRequiredService<IManager<User>>() |> ignore
             scope.ServiceProvider.GetRequiredService<IRepository<User>>() |> ignore
 

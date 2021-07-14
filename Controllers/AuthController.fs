@@ -1,7 +1,6 @@
 namespace TodoApi.Controllers
 
 open System
-open System.Linq
 open System.IdentityModel.Tokens.Jwt
 open System.Security.Claims
 open System.Text
@@ -16,6 +15,7 @@ open TodoApi.Models
 open TodoApi.Repositories
 open TodoApi.Managers
 open TodoApi.Extensions.HeaderDictionaryExtensions
+open TodoApi.Extensions.StringExtensions
 open TodoApi
 
 [<Route("api/v1/auth")>]
@@ -29,17 +29,20 @@ type AuthController private () =
     member val _configuration : IConfiguration = null with get, set
     member val _accessTokenManager : IAccessTokenManager = null with get, set
     member val _localizer : IStringLocalizer<SharedResources> = null with get, set
+    member val _passwordHasher : IPasswordHasherManager = null with get, set
 
     new (
             userRepository : IUserRepository,
             configuration : IConfiguration,
             accessTokenManager : IAccessTokenManager,
-            localizer : IStringLocalizer<SharedResources>
+            localizer : IStringLocalizer<SharedResources>,
+            passwordHasher : IPasswordHasherManager
         ) as this = AuthController() then
         this._userRepository <- userRepository
         this._configuration <- configuration
         this._accessTokenManager <- accessTokenManager
         this._localizer <- localizer
+        this._passwordHasher <- passwordHasher
 
     [<HttpPost("sign-in")>]
     [<ProducesResponseType(StatusCodes.Status200OK, Type = typedefof<SuccessAuthResponse>)>]
@@ -64,7 +67,7 @@ type AuthController private () =
                     let removalFilter = Builders<AccessToken>.Filter.Where(fun t -> t.User = user.Id)
                     this._accessTokenManager.DeleteManyAsync removalFilter |> Async.AwaitTask |> Async.RunSynchronously |> ignore
 
-                    let isSame = credentials.Password = user.Password
+                    let isSame = this._passwordHasher.Compare credentials.Password user.Password
                     
                     match isSame with
                     | true ->
@@ -100,12 +103,7 @@ type AuthController private () =
     member this.Logout () =
         async {
             let token = this.HttpContext.Request.Headers.ExtractJsonWebToken()
-            let handler = JwtSecurityTokenHandler()
-            let decoded = handler.ReadJwtToken(token)
-            let id = decoded.Claims.ToList()
-                        .Where(fun claim -> claim.Type = "nameid")
-                        .Select(fun claim -> claim.Value)
-                        .SingleOrDefault()
+            let id = token.SelectClaim "nameid"
 
             let removalFilter = Builders<AccessToken>.Filter.Where(fun t -> t.User = id)
             let! _ = this._accessTokenManager.DeleteManyAsync removalFilter |> Async.AwaitTask

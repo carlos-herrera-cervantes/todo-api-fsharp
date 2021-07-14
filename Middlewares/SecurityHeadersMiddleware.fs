@@ -42,30 +42,30 @@ type SecurityHeadersMiddleware private () =
                                         "xr-spatial-tracking 'none';"
                                     ))
 
-        context.Response.Headers.Add("Content-Security-Policy", StringValues(
-                                        "base-uri 'none';" +
-                                        "block-all-mixed-content;" +
-                                        "child-src 'none';" +
-                                        "connect-src 'none';" +
-                                        "default-src 'none';" +
-                                        "font-src 'none';" +
-                                        "form-action 'none';" +
-                                        "frame-ancestors 'none';" +
-                                        "frame-src 'none';" +
-                                        "img-src 'none';" +
-                                        "manifest-src 'none';" +
-                                        "media-src 'none';" +
-                                        "object-src 'none';" +
-                                        "sandbox;" +
-                                        "script-src 'none';" +
-                                        "script-src-attr 'none';" +
-                                        "script-src-elem 'none';" +
-                                        "style-src 'none';" +
-                                        "style-src-attr 'none';" +
-                                        "style-src-elem 'none';" +
-                                        "upgrade-insecure-requests;" +
-                                        "worker-src 'none';"
-                                    ))
+        // context.Response.Headers.Add("Content-Security-Policy", StringValues(
+        //                                 "base-uri 'none';" +
+        //                                 "block-all-mixed-content;" +
+        //                                 "child-src 'none';" +
+        //                                 "connect-src 'none';" +
+        //                                 "default-src 'none';" +
+        //                                 "font-src 'none';" +
+        //                                 "form-action 'none';" +
+        //                                 "frame-ancestors 'none';" +
+        //                                 "frame-src 'none';" +
+        //                                 "img-src 'none';" +
+        //                                 "manifest-src 'none';" +
+        //                                 "media-src 'none';" +
+        //                                 "object-src 'none';" +
+        //                                 "sandbox;" +
+        //                                 "script-src 'none';" +
+        //                                 "script-src-attr 'none';" +
+        //                                 "script-src-elem 'none';" +
+        //                                 "style-src 'none';" +
+        //                                 "style-src-attr 'none';" +
+        //                                 "style-src-elem 'none';" +
+        //                                 "upgrade-insecure-requests;" +
+        //                                 "worker-src 'none';"
+        //                             ))
 
         let task = this._next.Invoke(context)
         task

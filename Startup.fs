@@ -46,6 +46,7 @@ type Startup private () =
         services.AddTransient<IAccessTokenManager, AccessTokenManager>() |> ignore
         services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>() |> ignore
         services.AddSingleton<IStringLocalizer, JsonStringLocalizer>() |> ignore
+        services.AddSingleton<IPasswordHasherManager, PasswordHasher>() |> ignore
 
     member this.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =
         if env.IsDevelopment() then

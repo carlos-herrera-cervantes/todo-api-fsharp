@@ -9,17 +9,25 @@ type UserManager private () =
   
   member val _userManager : IManager<User> = null with get, set
   member val _mapper : IMapper = null with get, set
+  member val _passwordHasher : IPasswordHasherManager = null with get, set
 
-  new (userManager : IManager<User>, mapper : IMapper) as this = UserManager() then
+  new (
+        userManager : IManager<User>,
+        mapper : IMapper,
+        passwordHasher : IPasswordHasherManager
+      ) as this = UserManager() then
     this._userManager <- userManager
     this._mapper <- mapper
+    this._passwordHasher <- passwordHasher
 
   interface IUserManager with
 
     /// <summary>Creates a new user document</summary>
     /// <param name="user">User object class</param>
     /// <returns>User</returns>
-    member this.CreateAsync(user: User) = this._userManager.CreateAsync user
+    member this.CreateAsync(user: User) =
+      user.Password <- this._passwordHasher.Hash user.Password
+      this._userManager.CreateAsync user
 
     /// <summary>Deletes a document</summary>
     /// <param name="id">Document ID</param>
